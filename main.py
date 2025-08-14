@@ -5,6 +5,12 @@ from pipes import *
 from game_objects import *
 from settings import Settings
 from pipes import *
+from rain import RainEffect
+
+def cycle_1_2_3():
+    while True:
+        for i in [1, 2, 3]:
+            yield i
 
 class FlappyBird:
     def __init__(self):
@@ -16,7 +22,10 @@ class FlappyBird:
         self.score = Score(self)
         self.first_dead = False
         self.mask_flag = False
-        self.player_flag = False
+        self.player_cycle = cycle_1_2_3()
+        self.player_flag = 3
+        self.rain_flag = True
+        self.rain = RainEffect(self.SCREEN, (self.settings.WIDTH, self.settings.HEIGHT))
         self.load_assets()
         self.new_game()
 
@@ -66,6 +75,14 @@ class FlappyBird:
         self.bird_images = [pg.transform.scale(sprite,bird_size) for sprite in self.bird_images]
         self.player.update_images(deque(self.bird_images))
 
+    def change_player_2(self):
+        self.settings.IMAGE_SCALE = 1.8
+        self.bird_images = [pg.image.load(f'assets/bird_2/{index}.png').convert_alpha() for index in range(5)]
+        #Scaling our player
+        bird_image = self.bird_images[0]
+        bird_size = bird_image.get_width() * self.settings.IMAGE_SCALE,bird_image.get_height() * self.settings.IMAGE_SCALE
+        self.bird_images = [pg.transform.scale(sprite,bird_size) for sprite in self.bird_images]
+        self.player.update_images(deque(self.bird_images))
     def new_game(self):
         if self.first_dead:
             self.change_player()
@@ -83,7 +100,9 @@ class FlappyBird:
         self.pipe_handler = PipeHandler(self)
 
     def draw(self):
-        self.bg.draw()
+        self.bg.draw() 
+        if self.rain_flag:  
+            self.rain.draw() 
         self.sprites_group.draw(self.SCREEN)
         self.ground.draw()  
         self.score.draw()
@@ -95,6 +114,8 @@ class FlappyBird:
     def update(self):
         self.sprites_group.update()
         self.bg.update()
+        if self.rain_flag:
+            self.rain.update() 
         self.ground.update()
         self.pipe_handler.update()
         self.clock.tick(self.settings.FPS)
@@ -108,11 +129,15 @@ class FlappyBird:
                 if event.key == pg.K_m:
                     self.mask_flag = not self.mask_flag
                 if event.key == pg.K_z:
-                    self.player_flag = not self.player_flag
-                    if self.player_flag:
+                    self.player_flag = next(self.player_cycle)
+                    if self.player_flag == 1:
                         self.change_player()
-                    else:
+                    elif self.player_flag == 2:
                         self.change_player_1()
+                    elif self.player_flag == 3:
+                        self.change_player_2()
+                if event.key == pg.K_r:
+                    self.rain_flag = not self.rain_flag
             self.player.check_event(event)
 
     def run(self):
