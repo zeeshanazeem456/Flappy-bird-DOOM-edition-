@@ -5,7 +5,6 @@ from pipes import *
 from game_objects import *
 from settings import Settings
 from pipes import *
-from fire import *
 
 class FlappyBird:
     def __init__(self):
@@ -14,7 +13,6 @@ class FlappyBird:
         self.SCREEN = pg.display.set_mode((self.settings.WIDTH,self.settings.HEIGHT))
         self.clock = pg.time.Clock()
         self.sound = Sound()
-        self.fire = DoomFire(self)
         self.score = Score(self)
         self.first_dead = False
         self.mask_flag = False
@@ -86,7 +84,6 @@ class FlappyBird:
 
     def draw(self):
         self.bg.draw()
-        self.fire.draw()
         self.sprites_group.draw(self.SCREEN)
         self.ground.draw()  
         self.score.draw()
@@ -98,7 +95,6 @@ class FlappyBird:
     def update(self):
         self.sprites_group.update()
         self.bg.update()
-        self.fire.update()
         self.ground.update()
         self.pipe_handler.update()
         self.clock.tick(self.settings.FPS)
