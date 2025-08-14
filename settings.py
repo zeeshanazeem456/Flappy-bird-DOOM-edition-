@@ -20,5 +20,5 @@ class Settings:
         self.PIPE_WIDTH = 200 
         self.PIPE_HEIGHT = self.HEIGHT
         self.Distance_between_pipes = 650
-        self.GAP_HEIGHT = 300
+        self.GAP_HEIGHT = 250
         self.HALF_GAP_HEIGHT = self.GAP_HEIGHT // 2

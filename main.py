@@ -7,10 +7,13 @@ from settings import Settings
 from pipes import *
 from rain import RainEffect
 
+num = 1
 def cycle_1_2_3():
-    while True:
-        for i in [1, 2, 3]:
-            yield i
+    global num
+    num += 1
+    if num > 3:
+        num = 1
+    return num
 
 class FlappyBird:
     def __init__(self):
@@ -57,6 +60,12 @@ class FlappyBird:
         mask_size = mask_image.get_width() * self.settings.SCALE, mask_image.get_height() * self.settings.SCALE
         self.mask_image = pg.transform.scale(mask_image, mask_size)
 
+    def draw_text_top_right(self, text, font_size=30, color='white', offset=(10, 10)):
+        font = pg.font.Font(None, font_size)  
+        text_surface = font.render(text, True, color)
+        text_rect = text_surface.get_rect()
+        text_rect.bottomleft = (offset[0], self.settings.HEIGHT - offset[1] + 10)
+        self.SCREEN.blit(text_surface, text_rect)
 
     def change_player(self):
         self.settings.IMAGE_SCALE = 2
@@ -85,7 +94,13 @@ class FlappyBird:
         self.player.update_images(deque(self.bird_images))
     def new_game(self):
         if self.first_dead:
-            self.change_player()
+            self.player_flag = cycle_1_2_3()
+            if self.player_flag == 1:
+                self.change_player()
+            elif self.player_flag == 2:
+                self.change_player_1()
+            elif self.player_flag == 3:
+                self.change_player_2()
         if not self.first_dead:
             self.settings.IMAGE_SCALE = 1
             self.bird_images = [pg.image.load(f'assets/bird/{index}.png').convert_alpha() for index in range(5)]
@@ -109,6 +124,7 @@ class FlappyBird:
         #pg.draw.rect(self.SCREEN,'yellow',self.player.rect, 4) 
         if self.mask_flag: 
             self.player.mask.to_surface(self.SCREEN,unsetcolor = None,dest = self.player.rect,setcolor = 'green')
+        self.draw_text_top_right("Press z for character change!")
         pg.display.flip()
 
     def update(self):
@@ -129,7 +145,7 @@ class FlappyBird:
                 if event.key == pg.K_m:
                     self.mask_flag = not self.mask_flag
                 if event.key == pg.K_z:
-                    self.player_flag = next(self.player_cycle)
+                    self.player_flag = cycle_1_2_3()
                     if self.player_flag == 1:
                         self.change_player()
                     elif self.player_flag == 2:
