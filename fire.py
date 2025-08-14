@@ -4,7 +4,7 @@ from random import randint
 from settings import *
 
 STEPS_BETWEEN_COLORS = 4
-COLORS = ['black', 'red', 'orange', 'yellow', 'white']
+COLORS = ['black', 'green', 'orange', 'yellow', 'white']
 PIXEL_SIZE = 4
 
 FIRE_REPS = 4

@@ -17,6 +17,8 @@ class FlappyBird:
         self.fire = DoomFire(self)
         self.score = Score(self)
         self.first_dead = False
+        self.mask_flag = False
+        self.player_flag = False
         self.load_assets()
         self.new_game()
 
@@ -49,13 +51,26 @@ class FlappyBird:
         self.mask_image = pg.transform.scale(mask_image, mask_size)
 
 
+    def change_player(self):
+        self.settings.IMAGE_SCALE = 2
+        self.bird_images = [pg.image.load(f'assets/bird_1/{index}.png').convert_alpha() for index in range(5)]
+        bird_image = self.bird_images[0]
+        bird_size = bird_image.get_width() * self.settings.IMAGE_SCALE,bird_image.get_height() * self.settings.IMAGE_SCALE
+        self.bird_images = [pg.transform.scale(sprite,bird_size) for sprite in self.bird_images]
+        self.player.update_images(deque(self.bird_images))
+
+    def change_player_1(self):
+        self.settings.IMAGE_SCALE = 1
+        self.bird_images = [pg.image.load(f'assets/bird/{index}.png').convert_alpha() for index in range(5)]
+        #Scaling our player
+        bird_image = self.bird_images[0]
+        bird_size = bird_image.get_width() * self.settings.IMAGE_SCALE,bird_image.get_height() * self.settings.IMAGE_SCALE
+        self.bird_images = [pg.transform.scale(sprite,bird_size) for sprite in self.bird_images]
+        self.player.update_images(deque(self.bird_images))
+
     def new_game(self):
         if self.first_dead:
-            self.settings.IMAGE_SCALE = 2
-            self.bird_images = [pg.image.load(f'assets/bird_1/{index}.png').convert_alpha() for index in range(5)]
-            bird_image = self.bird_images[0]
-            bird_size = bird_image.get_width() * self.settings.IMAGE_SCALE,bird_image.get_height() * self.settings.IMAGE_SCALE
-            self.bird_images = [pg.transform.scale(sprite,bird_size) for sprite in self.bird_images]
+            self.change_player()
         if not self.first_dead:
             self.settings.IMAGE_SCALE = 1
             self.bird_images = [pg.image.load(f'assets/bird/{index}.png').convert_alpha() for index in range(5)]
@@ -75,8 +90,9 @@ class FlappyBird:
         self.sprites_group.draw(self.SCREEN)
         self.ground.draw()  
         self.score.draw()
-        #pg.draw.rect(self.SCREEN,'yellow',self.player.rect, 4)  
-        #self.player.mask.to_surface(self.SCREEN,unsetcolor = None,dest = self.player.rect,setcolor = 'green')
+        #pg.draw.rect(self.SCREEN,'yellow',self.player.rect, 4) 
+        if self.mask_flag: 
+            self.player.mask.to_surface(self.SCREEN,unsetcolor = None,dest = self.player.rect,setcolor = 'green')
         pg.display.flip()
 
     def update(self):
@@ -92,6 +108,15 @@ class FlappyBird:
             if event.type == pg.QUIT or (event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE):
                 pg.quit()
                 sys.exit()
+            if event.type == pg.KEYDOWN:
+                if event.key == pg.K_m:
+                    self.mask_flag = not self.mask_flag
+                if event.key == pg.K_z:
+                    self.player_flag = not self.player_flag
+                    if self.player_flag:
+                        self.change_player()
+                    else:
+                        self.change_player_1()
             self.player.check_event(event)
 
     def run(self):

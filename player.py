@@ -77,3 +77,8 @@ class Player(pg.sprite.Sprite):
                 self.Music_Flag = False
             self.first_jump = True
             self.jump()
+
+    def update_images(self, new_images):
+        self.images = new_images
+        self.image = self.images[0]
+

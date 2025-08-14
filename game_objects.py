@@ -57,6 +57,7 @@ class Sound:
         self.point_sound = pg.mixer.Sound('assets/sound/point.wav')
         self.wing_sound = pg.mixer.Sound('assets/sound/wing.wav')
         self.Theme_song = pg.mixer.Sound('assets/Theme_song.mp3')
+        self.Theme_song.set_volume(0.5)
 
 class Score:
     def __init__(self, game):
